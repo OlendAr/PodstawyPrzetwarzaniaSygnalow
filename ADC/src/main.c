@@ -19,36 +19,31 @@
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_dac.h" 
 
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
-uint16_t Sygnal1;
-uint16_t Sygnal2;
-uint16_t Wynik; //tablica wynikowa do obliczen 
+uint16_t Sygnal1 = 0;
+uint16_t Sygnal2 = 0;
+uint16_t Wynik = 0; //tablica wynikowa do obliczen 
 
 void _GPIO_Init(void) {
 GPIO_InitTypeDef	GPIO_InitStructure;
 
-/*Enabling GPIO clock*/	
+//Enabling GPIO clock
 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 
-/*GPIO PB1 configuration ADC_1*/	
+//GPIO PB1 configuration ADC_1	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-/*GPIO PA5 configuration ADC_2*/		
+//GPIO PA5 configuration ADC_2		
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
-	/*GPIO PA5, PA4 configuration DAC_1, DAC_2*/	
+//GPIO PA5, PA4 configuration DAC_1, DAC_2
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource4, DAC_Channel_1);
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, DAC_Channel_2);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5/ GPIO_Pin_4;
@@ -56,16 +51,40 @@ RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
+void _TIM_Init(void){
+TIM_TimeBaseInitTypeDef TIM_BaseInitStructure;
+TIM_OCInitTypeDef TIM_OCInitStructure;
 
+//Enabling TIM clock	
+RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE); //to moze byc zle
+	
+//TIM1 configuration
+	TIM_BaseInitStructure.TIM_ClockDivision = 0;
+	TIM_BaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_BaseInitStructure.TIM_Period = 49999; // 
+	TIM_BaseInitStructure.TIM_Prescaler = 5599; //5600 = 15 kHZ
+	TIM_BaseInitStructure.TIM_RepetitionCounter = 0x0000;	
+	TIM_TimeBaseInit(TIM1, &TIM_BaseInitStructure);	
+
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Timing;
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCInitStructure.TIM_Pulse	= 49999;
+	TIM_OC1Init(TIM1, &TIM_OCInitStructure);	
+
+//Enabling TIM	
+	TIM_ITConfig(TIM1, TIM_IT_CC1, ENABLE);	
+	TIM_Cmd(TIM1, ENABLE);	
+}
 void _ADC_Init(void) {
 ADC_InitTypeDef ADC_InitStructure;
 ADC_CommonInitTypeDef ADC_CommonInitStruct;
 		
-/*Enabling ADC clock*/
+//Enabling ADC clock
 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
 	
-/*ADC1 configuration*/
+//ADC1 configuration
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
 	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1; //Timer
@@ -75,7 +94,7 @@ RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
 	ADC_InitStructure.ADC_ScanConvMode = DISABLE; 
 	ADC_Init(ADC1,&ADC_InitStructure);
 	
-/*ADC2 configuration*/
+//ADC2 configuration
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
 	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1; //Timer
@@ -85,44 +104,42 @@ RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
 	ADC_InitStructure.ADC_ScanConvMode = DISABLE; 
 	ADC_Init(ADC2,&ADC_InitStructure);
 
-/*ADC common init configuration for Multi mode ADC*/
+//ADC common init configuration for Multi mode ADC
 	ADC_CommonInitStruct.ADC_Mode = ADC_DualMode_RegSimult;
 	ADC_CommonInitStruct.ADC_DMAAccessMode = //ADC_DMAAccessMode_Disabled; ADC_DMAAccessMode_1; ADC_DMAAccessMode_2; ADC_DMAAccessMode_3 
 	ADC_CommonInitStruct.ADC_Prescaler = //ADC_Prescaler_Div2; ADC_Prescaler_Div4; ADC_Prescaler_Div6; ADC_Prescaler_Div8
 	ADC_CommonInitStruct.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles; //ADC_TwoSamplingDelay_5Cycles - i tak dalej po 1 do 20 cykli	
 
-/*Enabling ADC*/	
+//Enabling ADC	
 	ADC_Cmd(ADC1, ENABLE);
 	ADC_Cmd(ADC2, ENABLE);
 
-/*Regular channels config*/
+//Regular channels config
 	ADC_RegularChannelConfig(ADC1,ADC_Channel_1,1,ADC_SampleTime_144Cycles);
 	ADC_RegularChannelConfig(ADC2,ADC_Channel_2,1,ADC_SampleTime_144Cycles);
 
-/*Activating continuous mode*/
+//Activating continuous mode
 	ADC_ContinuousModeCmd(ADC1, ENABLE);
 	ADC_ContinuousModeCmd(ADC2, ENABLE);
 
-/*DMA for Multi mode ADC*/
+//DMA for Multi mode ADC
 	ADC_MultiModeDMARequestAfterLastTransferCmd(ENABLE);
 }
 
 void _DAC_Init(void) {
 	DAC_InitTypeDef  DAC_InitStructure; 
 
-/*Enabling DAC clock*/	
+//Enabling DAC clock
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);	
 	
-/*DAC Configuration*/	
+//DAC Configuration
 	DAC_InitStructure.DAC_Trigger = DAC_Trigger_None;
   DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
   DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
   DAC_Init(DAC_Channel_1, &DAC_InitStructure);
-  DAC_Init(DAC_Channel_2, &DAC_InitStructure);
 
-	/*Enabling DAC*/  
+//Enabling DAC
 	DAC_Cmd(DAC_Channel_1, ENABLE);
-	DAC_Cmd(DAC_Channel_2, ENABLE);
 }
 
 /* JAK Z DMA TO NVIC OK KONCA BUFFORA, JAK NIE TO OD KONCA KONWERSJI
@@ -155,8 +172,8 @@ void _DMA_Init(void) {
 
 }
 */
-/*Starting conversion*/
-/*Reading the ADCs converted values*/	
+//Starting conversion
+//Reading the ADCs converted values
 	int ADC1_Convert(){
 		ADC_SoftwareStartConv(ADC1);
 		while(!ADC_GetFlagStatus(ADC1,ADC_FLAG_EOC));
@@ -169,45 +186,37 @@ void _DMA_Init(void) {
 		return Sygnal2 = ADC_GetConversionValue(ADC2);
 	}
 	
-/*Reading the DAC values*/
+int Suma(){
+
+	Wynik = Sygnal1 + Sygnal2;
+}
+
+//Reading the DAC values
 int DAC_Convert(){
-	DAC_SetChannel1Data(DAC_Align_12b_R, Sygnal1);
-	DAC_SetChannel2Data(DAC_Align_12b_R, Sygnal2);
+	DAC_SetChannel1Data(DAC_Align_12b_R, Wynik);
+
 }
 
 int main(void) {
 	_GPIO_Init();
+	_TIM_Init();
 	_ADC_Init();
 	_DAC_Init();
 
-/* Infinite loop */
+// Infinite loop 
   while (1)
   ADC1_Convert();
 	ADC2_Convert();
+	Suma();
 	DAC_Convert();
 }
 #ifdef  USE_FULL_ASSERT
 
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
 void assert_failed(uint8_t* file, uint32_t line) { 
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-
+  
   /* Infinite loop */
   while (1) {
   }
 }
 #endif
-
-/**
-  * @}
-  */
-
-
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

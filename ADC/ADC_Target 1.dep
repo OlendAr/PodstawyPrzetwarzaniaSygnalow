@@ -1,5 +1,5 @@
 Dependencies for Project 'ADC', Target 'Target 1': (DO NOT MODIFY !)
-F (.\src\main.c)(0x56A0F3EE)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.\ -I.\inc -I.\utilities -I.\libraries\STM32F4xx_StdPeriph_Driver\inc -I.\libraries\CMSIS\Include-I "C:\Program Files (x86)\Keil\ARM\RV31\INC"-I "C:\Program Files (x86)\Keil\ARM\CMSIS\Include"-I "C:\Program Files (x86)\Keil\ARM\Inc\ST\STM32F4xx"-DUSE_STDPERIPH_DRIVER -DSTM32F4XX -DSTM32F40XX-o .\obj\main.o --omf_browse .\obj\main.crf --depend .\obj\main.d)
+F (.\src\main.c)(0x56A10B76)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork -I.\ -I.\inc -I.\utilities -I.\libraries\STM32F4xx_StdPeriph_Driver\inc -I.\libraries\CMSIS\Include-I "C:\Program Files (x86)\Keil\ARM\RV31\INC"-I "C:\Program Files (x86)\Keil\ARM\CMSIS\Include"-I "C:\Program Files (x86)\Keil\ARM\Inc\ST\STM32F4xx"-DUSE_STDPERIPH_DRIVER -DSTM32F4XX -DSTM32F40XX-o .\obj\main.o --omf_browse .\obj\main.crf --depend .\obj\main.d)
 I (C:\Users\Artur\Desktop\PodstawyPrzetwarzaniaSygnalow\ADC\inc\main.h)(0x5523AAA2)
 I (C:\Users\Artur\Desktop\PodstawyPrzetwarzaniaSygnalow\ADC\inc\stm32f4xx.h)(0x54F97718)
 I (C:\Program Files (x86)\Keil\ARM\CMSIS\Include\core_cm4.h)(0x51C7FB9A)
