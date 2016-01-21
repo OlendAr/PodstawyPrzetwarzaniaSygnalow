@@ -56,17 +56,6 @@ RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
-void _NVIC_Init(void)
-{
-  NVIC_InitTypeDef NVIC_InitStructure;
-
- //Configure and enable ADC interrupt 
-  NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-}
 
 void _ADC_Init(void) {
 ADC_InitTypeDef ADC_InitStructure;
@@ -117,6 +106,7 @@ RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC2, ENABLE);
 /*DMA for Multi mode ADC*/
 	ADC_MultiModeDMARequestAfterLastTransferCmd(ENABLE);
 }
+
 void _DAC_Init(void) {
 	DAC_InitTypeDef  DAC_InitStructure; 
 
@@ -134,6 +124,7 @@ void _DAC_Init(void) {
 	DAC_Cmd(DAC_Channel_1, ENABLE);
 	DAC_Cmd(DAC_Channel_2, ENABLE);
 }
+
 /* JAK Z DMA TO NVIC OK KONCA BUFFORA, JAK NIE TO OD KONCA KONWERSJI
 
 void _DMA_Init(void) {
@@ -171,16 +162,19 @@ void _DMA_Init(void) {
 		while(!ADC_GetFlagStatus(ADC1,ADC_FLAG_EOC));
 		return Sygnal1 = ADC_GetConversionValue(ADC1);
 	}
+	
 	int ADC2_Convert(){
 		ADC_SoftwareStartConv(ADC2);
 		while(!ADC_GetFlagStatus(ADC2,ADC_FLAG_EOC));
 		return Sygnal2 = ADC_GetConversionValue(ADC2);
 	}
+	
 /*Reading the DAC values*/
 int DAC_Convert(){
 	DAC_SetChannel1Data(DAC_Align_12b_R, Sygnal1);
 	DAC_SetChannel2Data(DAC_Align_12b_R, Sygnal2);
 }
+
 int main(void) {
 	_GPIO_Init();
 	_ADC_Init();
