@@ -1,0 +1,31 @@
+/* DMA
+
+JAK Z DMA TO NVIC OK KONCA BUFFORA, JAK NIE TO OD KONCA KONWERSJI
+
+void _DMA_Init(void) {
+	DMA_InitTypeDef  DMA_InitStructure;
+	
+	Enabling DMA clock
+	RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_DMA1, ENABLE);
+
+	DMA Configuration
+	DMA_InitStructure.DMA_Channel = DMA_Channel_1; // wybor kanalu 
+  DMA_InitStructure.DMA_PeripheralBaseAddr = Syganl1;	 // urzadzenie 
+  DMA_InitStructure.DMA_Memory0BaseAddr = (uint16_t)&Wynik; // pamiec 
+  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory; // z urzadzenia przez DMA do pamieci 
+  DMA_InitStructure.DMA_BufferSize = 1;
+  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable; // inkrementacja wylaczona 
+  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable; // inkrementacja wylaczona 
+  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word; // wielkosc danych 
+  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord; // wielkosc danych 
+  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular; // praca w petli 
+  DMA_InitStructure.DMA_Priority = DMA_Priority_High; // okreslenie pierwszenstwa dla strumienia 
+  DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Enable; // okreslenie metody przekazywania danych dla strumienia       
+  DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_Full; 
+  DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+  DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+  
+	Inicjalizacja DMA 	
+  DMA_Init(DMA2_Stream1, &DMA_InitStructure);
+}
+*/
